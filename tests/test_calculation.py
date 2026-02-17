@@ -20,6 +20,7 @@ from app.calculation import (
     SubtractCalculation,
     MultiplyCalculation,
     DivideCalculation,
+    PowerCalculation,
     Calculation
 )
 
@@ -162,6 +163,49 @@ def test_multiply_calculation_execute_negative(mock_multiplication):
     # Verify that the exception message is as expected
     assert str(exc_info.value) == "Multiplication error"
 
+@patch.object(Operation, 'power')
+def test_power_calculation_execute_positive(mock_power):
+    """
+    Test the execute method of PowerCalculation for a positive scenario.
+
+    This test verifies that the PowerCalculation class correctly calls the power
+    method of the Operation class with the provided operands and returns the expected result.
+    """
+    # Arrange
+    a = 3.0
+    b = 3.0
+    expected_result = 27.0
+    mock_power.return_value = expected_result
+    power_calc = PowerCalculation(a, b)
+
+    # Act
+    result = power_calc.execute()
+
+    # Assert
+    mock_power.assert_called_once_with(a, b)
+    assert result == expected_result
+
+
+@patch.object(Operation, 'power')
+def test_power_calculation_execute_negative(mock_power):
+    """
+    Test the execute method of PowerCalculation for a negative scenario.
+
+    This test ensures that if the Operation.power method raises an exception,
+    the PowerCalculation.execute method propagates it correctly.
+    """
+    # Arrange
+    a = 10.0
+    b = 5.0
+    mock_power.side_effect = Exception("Power error")
+    power_calc = PowerCalculation(a, b)
+
+    # Act & Assert
+    with pytest.raises(Exception) as exc_info:
+        power_calc.execute()
+
+    # Verify that the exception message is as expected
+    assert str(exc_info.value) == "Power error"
 
 @patch.object(Operation, 'division')
 def test_divide_calculation_execute_positive(mock_division):
@@ -311,6 +355,24 @@ def test_factory_creates_divide_calculation():
     assert calc.a == a
     assert calc.b == b
 
+def test_factory_creates_power_calculation():
+    """
+    Test that CalculationFactory creates a PowerCalculation instance.
+
+    This test ensures that the factory correctly instantiates the PowerCalculation
+    class when the 'power' calculation type is requested.
+    """
+    # Arrange
+    a = 4.0
+    b = 2.0
+
+    # Act
+    calc = CalculationFactory.create_calculation('power', a, b)
+
+    # Assert
+    assert isinstance(calc, PowerCalculation)
+    assert calc.a == a
+    assert calc.b == b
 
 def test_factory_create_unsupported_calculation():
     """
@@ -444,6 +506,27 @@ def test_calculation_str_representation_division(mock_division):
     expected_str = f"{divide_calc.__class__.__name__}: {a} Divide {b} = 2.0"
     assert calc_str == expected_str
 
+@patch.object(Operation, 'power', return_value=16.0)
+def test_calculation_str_representation_power(mock_multiplication):
+    """
+    Test the __str__ method of PowerCalculation.
+
+    This test verifies that the string representation of a PowerCalculation instance
+    is formatted correctly, displaying the class name, operation, operands, and result.
+    """
+    # Arrange
+    a = 4.0
+    b = 2.0
+    power_calc = PowerCalculation(a, b)
+
+    # Act
+    calc_str = str(power_calc)
+
+    # Assert
+    # Expected string should reflect the operation name derived from the class name ('Multiply')
+    expected_str = f"{power_calc.__class__.__name__}: {a} Power {b} = 16.0"
+    assert calc_str == expected_str
+
 
 def test_calculation_repr_representation_subtraction():
     """
@@ -487,6 +570,7 @@ def test_calculation_repr_representation_division():
     assert calc_repr == expected_repr
 
 
+
 # -----------------------------------------------------------------------------------
 # Parameterized Tests for Execute Method
 # -----------------------------------------------------------------------------------
@@ -496,13 +580,15 @@ def test_calculation_repr_representation_division():
     ('subtract', 10.0, 5.0, 5.0),
     ('multiply', 10.0, 5.0, 50.0),
     ('divide', 10.0, 5.0, 2.0),
+    ('power',5.0,2.0,25.0),
 ])
 @patch.object(Operation, 'addition')
 @patch.object(Operation, 'subtraction')
 @patch.object(Operation, 'multiplication')
 @patch.object(Operation, 'division')
+@patch.object(Operation, 'power')
 def test_calculation_execute_parameterized(
-    mock_division, mock_multiplication, mock_subtraction, mock_addition,
+    mock_power,mock_division, mock_multiplication, mock_subtraction, mock_addition,
     calc_type, a, b, expected_result
 ):
     """
@@ -520,7 +606,8 @@ def test_calculation_execute_parameterized(
         mock_multiplication.return_value = expected_result
     elif calc_type == 'divide':
         mock_division.return_value = expected_result
-
+    elif calc_type == 'power':
+        mock_power.return_value = expected_result
     # Act: Create calculation instance and execute
     calc = CalculationFactory.create_calculation(calc_type, a, b)
     result = calc.execute()
@@ -534,6 +621,8 @@ def test_calculation_execute_parameterized(
         mock_multiplication.assert_called_once_with(a, b)
     elif calc_type == 'divide':
         mock_division.assert_called_once_with(a, b)
+    elif calc_type == 'power':
+        mock_power.assert_called_once_with(a, b)
 
     assert result == expected_result
 
@@ -547,13 +636,15 @@ def test_calculation_execute_parameterized(
     ('subtract', 10.0, 5.0, "SubtractCalculation: 10.0 Subtract 5.0 = 5.0"),
     ('multiply', 10.0, 5.0, "MultiplyCalculation: 10.0 Multiply 5.0 = 50.0"),
     ('divide', 10.0, 5.0, "DivideCalculation: 10.0 Divide 5.0 = 2.0"),
+    ('power', 3.0, 2.0, "PowerCalculation: 3.0 Power 2.0 = 9.0"),
 ])
 @patch.object(Operation, 'addition', return_value=15.0)
 @patch.object(Operation, 'subtraction', return_value=5.0)
 @patch.object(Operation, 'multiplication', return_value=50.0)
 @patch.object(Operation, 'division', return_value=2.0)
+@patch.object(Operation, 'power', return_value=9.0)
 def test_calculation_str_parameterized(
-    mock_division, mock_multiplication, mock_subtraction, mock_addition,
+    mock_power,mock_division, mock_multiplication, mock_subtraction, mock_addition,
     calc_type, a, b, expected_str
 ):
     """

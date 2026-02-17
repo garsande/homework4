@@ -362,3 +362,76 @@ def test_operations_invalid_input_types(calc_method, a, b, expected_exception):
         calc_method(a, b)
 
 
+# -----------------------------------------------------------------------------------
+# Test Power Method
+# -----------------------------------------------------------------------------------
+
+def test_power_positive():
+    """
+    Test the power method with two positive numbers.
+    
+    This test verifies that power of two positive numbers returns the correct product.
+    """
+    # Arrange
+    a = 2.0
+    b = 5.0
+    expected_result = 32.0
+
+    # Act
+    result = Operation.power(a, b)
+
+    # Assert
+    assert result == expected_result, f"Expected {a} * {b} to be {expected_result}, got {result}"
+
+
+def test_power_negative_odd_positive():
+    """
+    Test the power method with one positive and one negative number.
+    
+    This test verifies that power of a negative number by a positive odd number returns the correct product.
+    """
+    # Arrange
+    a = -2.0
+    b = 5.0
+    expected_result = -32.0
+
+    # Act
+    result = Operation.power(a, b)
+
+    # Assert
+    assert result == expected_result, f"Expected {a} * ({b}) to be {expected_result}, got {result}"
+
+def test_power_negative_even_positive():
+    """
+    Test the power method with one positive and one negative number.
+    
+    This test verifies that power of a negative number by a positive even number returns the correct product.
+    """
+    # Arrange
+    a = -2.0
+    b = 4.0
+    expected_result = 16.0
+
+    # Act
+    result = Operation.power(a, b)
+
+    # Assert
+    assert result == expected_result, f"Expected {a} * ({b}) to be {expected_result}, got {result}"    
+
+
+def test_power_with_zero():
+    """
+    Test the power method with zero as one of the operands.
+    
+    This test verifies that power of any number by zero returns one.
+    """
+    # Arrange
+    a = 10.0
+    b = 0.0
+    expected_result = 1.0
+
+    # Act
+    result = Operation.power(a, b)
+
+    # Assert
+    assert result == expected_result, f"Expected {a} * {b} to be {expected_result}, got {result}"

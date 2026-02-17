@@ -246,15 +246,15 @@ class DivideCalculation(Calculation):
         # Calls the division method from the Operation module to perform the division.
         return Operation.division(self.a, self.b)
 
-# @CalculationFactory.register_calculation('power')
-# class PowerCalculation(Calculation):
-#      """
-#      PowerCalculation represents a power operation.
+@CalculationFactory.register_calculation('power')
+class PowerCalculation(Calculation):
+     """
+     PowerCalculation represents a power operation.
     
-#      By encapsulating the power logic here, we achieve a clear separation of 
-#      concerns, making it easy to adjust the power logic without affecting other calculations.
-#      """
+     By encapsulating the power logic here, we achieve a clear separation of 
+     concerns, making it easy to adjust the power logic without affecting other calculations.
+     """
 
-#      def execute(self) -> float:
-#          # Calls the power method from the Operation module to perform the power operation.
-#          return Operation.power(self.a, self.b) # pragma: no cover
+     def execute(self) -> float:
+         # Calls the power method from the Operation module to perform the power operation.
+         return Operation.power(self.a, self.b) # pragma: no cover

@@ -275,6 +275,27 @@ def test_calculator_division_by_zero(monkeypatch, capsys):
     captured = capsys.readouterr()
     assert "Cannot divide by zero." in captured.out
 
+def test_calculator_power(monkeypatch, capsys):
+    """
+    Test the calculator's power operation.
+
+    AAA Pattern:
+    - Arrange: Prepare the input 'power 2 3' followed by 'exit'.
+    - Act: Call the calculator function.
+    - Assert: Verify that the correct result is displayed.
+    """
+    # Arrange
+    user_input = 'power 2 3\nexit\n'
+    monkeypatch.setattr('sys.stdin', StringIO(user_input))
+
+    # Act
+    with pytest.raises(SystemExit):
+        calculator()
+
+    # Assert
+    captured = capsys.readouterr()
+    assert "Result: PowerCalculation: 2.0 Power 3.0 = 8.0" in captured.out
+
 def test_calculator_history(monkeypatch, capsys):
     """
     Test the calculator's ability to display calculation history.
